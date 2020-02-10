@@ -51,3 +51,22 @@ func TestNewClient(t *testing.T) {
 		t.Errorf("failed creating client: %v", err)
 	}
 }
+
+func setup(t *testing.T, handler http.Handler) (insights.Client, *httptest.Server) {
+	var fun http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
+		if request.URL.Path == "/authenticate/foo" {
+			if _, err := io.WriteString(writer, `{ "token": "baz" }`); err != nil {
+				t.Fatalf("failed writing response: %v", err)
+			}
+		} else {
+			handler.ServeHTTP(writer, request)
+		}
+	}
+
+	server := httptest.NewServer(fun)
+	client, err := insights.NewClient(server.URL, "foo", "bar")
+	if err != nil {
+		t.Fatalf("failed creating client: %v", err)
+	}
+	return client, server
+}
