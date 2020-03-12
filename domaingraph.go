@@ -78,14 +78,20 @@ func (e Entity) model() entityModel {
 
 // Relationship represents a relationship between entities that may be managed at an Elimity Insights server.
 type Relationship struct {
-	FromEntityID   string
-	FromEntityType string
-	ToEntityID     string
-	ToEntityType   string
+	AttributeAssignments []AttributeAssignment
+	FromEntityID         string
+	FromEntityType       string
+	ToEntityID           string
+	ToEntityType         string
 }
 
 func (r Relationship) model() relationshipModel {
 	attributeAssignmentModels := []attributeAssignmentModel{}
+	for _, attributeAssignment := range r.AttributeAssignments {
+		attributeAssignmentModel := attributeAssignment.model()
+		attributeAssignmentModels = append(attributeAssignmentModels, attributeAssignmentModel)
+	}
+
 	return relationshipModel{
 		AttributeAssignments: attributeAssignmentModels,
 		FromID:               r.FromEntityID,

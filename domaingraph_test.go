@@ -68,7 +68,15 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			],
 			"relationships": [
 				{
-					"attributeAssignments": [],
+					"attributeAssignments": [
+						{
+							"attributeTypeName": "asd",
+							"value": {
+								"type": "string",
+								"value": "asd"
+							}
+						}
+					],
 					"fromId": "foo",
 					"fromType": "baz",
 					"toId": "bar",
@@ -96,6 +104,7 @@ func TestClientReloadDomainGraph(t *testing.T) {
 	barValue := insights.NewDateValue(barTime)
 	bazTime := time.Date(0, time.January, 1, 15, 4, 5, 0, time.UTC)
 	bazValue := insights.NewTimeValue(bazTime)
+	asdValue := insights.NewStringValue("asd")
 
 	domainGraph := insights.DomainGraph{
 		Entities: []insights.Entity{
@@ -130,6 +139,12 @@ func TestClientReloadDomainGraph(t *testing.T) {
 		},
 		Relationships: []insights.Relationship{
 			{
+				AttributeAssignments: []insights.AttributeAssignment{
+					{
+						AttributeTypeName: "asd",
+						Value:             asdValue,
+					},
+				},
 				FromEntityID:   "foo",
 				FromEntityType: "baz",
 				ToEntityID:     "bar",
