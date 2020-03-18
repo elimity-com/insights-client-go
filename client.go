@@ -28,36 +28,11 @@ type Client struct {
 	token    string
 }
 
-// NewClient creates a new client that is authenticated with the given credentials at a server at the given base path.
-func NewClient(basePath, userID, password string) (Client, error) {
-	type authenticateRequestBody struct {
-		Type  string `json:"type"`
-		Value string `json:"value"`
-	}
-	requestBody := authenticateRequestBody{
-		Type:  "password",
-		Value: password,
-	}
-
-	type authenticateResponseBody struct {
-		Token string `json:"token"`
-	}
-	var responseBody authenticateResponseBody
-
-	params := performRequestParams{
-		basePath:       basePath,
-		method:         http.MethodPost,
-		pathComponents: []string{"authenticate", userID},
-		requestBody:    requestBody,
-		responseBody:   &responseBody,
-	}
-	if err := performRequest(params); err != nil {
-		return Client{}, err
-	}
-
+// NewClient creates a new client that is authenticated with the given token at a server at the given base path.
+func NewClient(basePath, token string) (Client, error) {
 	client := Client{
 		basePath: basePath,
-		token:    responseBody.Token,
+		token:    token,
 	}
 	return client, nil
 }
