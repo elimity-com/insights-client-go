@@ -2,10 +2,11 @@ package insights_test
 
 import (
 	"encoding/json"
-	"github.com/elimity-com/insights-client-go"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/elimity-com/insights-client-go"
 )
 
 func TestClientCreateRelationshipAttributeType(t *testing.T) {

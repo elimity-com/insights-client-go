@@ -17,31 +17,31 @@ func NewBooleanValue(value bool) Value {
 	return Value{data: data}
 }
 
-// NewBooleanValue creates a new date value with the given value.
+// NewDateValue creates a new date value with the given value.
 func NewDateValue(value time.Time) Value {
 	data := dateValueData{value: value}
 	return Value{data: data}
 }
 
-// NewBooleanValue creates a new date-time value with the given value.
+// NewDateTimeValue creates a new date-time value with the given value.
 func NewDateTimeValue(value time.Time) Value {
 	data := dateTimeValueData{value: value}
 	return Value{data: data}
 }
 
-// NewBooleanValue creates a new number value with the given value.
+// NewNumberValue creates a new number value with the given value.
 func NewNumberValue(value float64) Value {
 	data := numberValueData{value: value}
 	return Value{data: data}
 }
 
-// NewBooleanValue creates a new string value with the given value.
+// NewStringValue creates a new string value with the given value.
 func NewStringValue(value string) Value {
 	data := stringValueData{value: value}
 	return Value{data: data}
 }
 
-// NewBooleanValue creates a new time value with the given value.
+// NewTimeValue creates a new time value with the given value.
 func NewTimeValue(value time.Time) Value {
 	data := timeValueData{value: value}
 	return Value{data: data}
