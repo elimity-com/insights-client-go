@@ -2,12 +2,13 @@ package insights_test
 
 import (
 	"encoding/json"
-	"github.com/elimity-com/insights-client-go"
-	"github.com/google/go-cmp/cmp"
 	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
+
+	"github.com/elimity-com/insights-client-go"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestClientReloadDomainGraph(t *testing.T) {

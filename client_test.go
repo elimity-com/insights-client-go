@@ -1,10 +1,11 @@
 package insights_test
 
 import (
-	"github.com/elimity-com/insights-client-go"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/elimity-com/insights-client-go"
 )
 
 func setup(t *testing.T, handler http.Handler) (insights.Client, *httptest.Server) {
