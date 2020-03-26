@@ -13,13 +13,12 @@ import (
 func makeRequestBodyReader(requestBody interface{}) io.Reader {
 	if requestBody == nil {
 		return nil
-	} else {
-		requestBodyBytes, err := json.Marshal(requestBody)
-		if err != nil {
-			panic(err)
-		}
-		return bytes.NewReader(requestBodyBytes)
 	}
+	requestBodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		panic(err)
+	}
+	return bytes.NewReader(requestBodyBytes)
 }
 
 // Client represents an authenticated HTTP client for an Elimity Insights server.
