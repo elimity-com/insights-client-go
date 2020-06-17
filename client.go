@@ -2,6 +2,7 @@ package insights
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -24,6 +25,7 @@ func makeRequestBodyReader(requestBody interface{}) io.Reader {
 // Client represents an authenticated HTTP client for an Elimity Insights server.
 type Client struct {
 	basePath string
+	client   *http.Client
 	token    string
 }
 
@@ -31,9 +33,25 @@ type Client struct {
 func NewClient(basePath, token string) (Client, error) {
 	client := Client{
 		basePath: basePath,
+		client:   http.DefaultClient,
 		token:    token,
 	}
 	return client, nil
+}
+
+// NewClientDisableTLSCertificateVerification creates a new client that is authenticated with the given token at a
+// server at the given base path.
+//
+// The resulting client does not verify the TLS certificate of the configured server.
+func NewClientDisableTLSCertificateVerification(basePath, token string) Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	client := &http.Client{Transport: transport}
+	return Client{
+		basePath: basePath,
+		client:   client,
+		token:    token,
+	}
 }
 
 func (c Client) performRequest(method string, pathComponents []string, requestBody, responseBody interface{}) error {
@@ -41,6 +59,7 @@ func (c Client) performRequest(method string, pathComponents []string, requestBo
 	params := performRequestParams{
 		authorization:  authorization,
 		basePath:       c.basePath,
+		client:         c.client,
 		method:         method,
 		pathComponents: pathComponents,
 		requestBody:    requestBody,
@@ -52,6 +71,7 @@ func (c Client) performRequest(method string, pathComponents []string, requestBo
 type performRequestParams struct {
 	authorization  string
 	basePath       string
+	client         *http.Client
 	method         string
 	pathComponents []string
 	requestBody    interface{}
@@ -74,7 +94,7 @@ func performRequest(params performRequestParams) error {
 		request.Header.Set("Content-Type", "application/json")
 	}
 
-	response, err := http.DefaultClient.Do(request)
+	response, err := params.client.Do(request)
 	if err != nil {
 		return fmt.Errorf("failed sending request: %w", err)
 	}
