@@ -1,6 +1,9 @@
 package insights
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 // AttributeAssignment represents the assignment of an attribute of a given type with a compatible value, which may be
 // managed at an Elimity Insights server.
@@ -27,9 +30,11 @@ func (c Client) ReloadDomainGraph(domainGraph DomainGraph) error {
 }
 
 // DomainGraph represents a graph of domain data that may be managed at an Elimity Insights server.
+// The Timestamp field is optional.
 type DomainGraph struct {
 	Entities      []Entity
 	Relationships []Relationship
+	Timestamp     *time.Time
 }
 
 func (g DomainGraph) model() domainGraphModel {
@@ -48,6 +53,7 @@ func (g DomainGraph) model() domainGraphModel {
 	return domainGraphModel{
 		Entities:      entityModels,
 		Relationships: relationshipModels,
+		Timestamp:     g.Timestamp,
 	}
 }
 
@@ -109,6 +115,7 @@ type attributeAssignmentModel struct {
 type domainGraphModel struct {
 	Entities      []entityModel       `json:"entities"`
 	Relationships []relationshipModel `json:"relationships"`
+	Timestamp     *time.Time          `json:"historyTimestamp,omitempty"`
 }
 
 type entityModel struct {
