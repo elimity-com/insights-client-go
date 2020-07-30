@@ -14,7 +14,7 @@ func (c Client) Alertf(format string, args ...interface{}) error {
 
 // CreateConnectorLogs creates the given connector logs at the given client's configured server.
 func (c Client) CreateConnectorLogs(logs []ConnectorLog) error {
-	pathComponents := []string{"connectorLogs"}
+	pathComponents := []string{"custom-connector-logs"}
 	var models []connectorLog
 	for _, log := range logs {
 		model := log.model()

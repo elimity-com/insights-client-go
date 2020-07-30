@@ -41,31 +41,6 @@ func NewTimeType() Type {
 	return Type{data: data}
 }
 
-func (t Type) model() typeModel {
-	switch t.data.(type) {
-	case booleanTypeData:
-		return "boolean"
-
-	case dateTypeData:
-		return "date"
-
-	case dateTimeTypeData:
-		return "dateTime"
-
-	case numberTypeData:
-		return "number"
-
-	case stringTypeData:
-		return "string"
-
-	case timeTypeData:
-		return "time"
-
-	default:
-		panic("unreachable")
-	}
-}
-
 type booleanTypeData struct{}
 
 type dateTypeData struct{}
@@ -75,8 +50,6 @@ type dateTimeTypeData struct{}
 type numberTypeData struct{}
 
 type typeData = interface{}
-
-type typeModel string
 
 type stringTypeData struct{}
 

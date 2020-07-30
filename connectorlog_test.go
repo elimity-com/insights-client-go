@@ -13,8 +13,8 @@ import (
 func TestClientCreateConnectorLogs(t *testing.T) {
 	timestamp := time.Now()
 	var fun http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path != "/connectorLogs" {
-			t.Fatalf(`got path %q, want "/connectorLogs"`, request.URL.Path)
+		if request.URL.Path != "/custom-connector-logs" {
+			t.Fatalf(`got path %q, want "/custom-connector-logs"`, request.URL.Path)
 		}
 
 		bs, err := ioutil.ReadAll(request.Body)
