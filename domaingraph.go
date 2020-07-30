@@ -24,7 +24,7 @@ func (a AttributeAssignment) model() attributeAssignmentModel {
 
 // ReloadDomainGraph reloads the given domain graph at the given client's configured server.
 func (c Client) ReloadDomainGraph(domainGraph DomainGraph) error {
-	pathComponents := []string{"domain-graph", "reload"}
+	pathComponents := []string{"custom-connector-domain-graph-reload"}
 	requestBody := domainGraph.model()
 	return c.performRequest(http.MethodPost, pathComponents, requestBody, nil)
 }
