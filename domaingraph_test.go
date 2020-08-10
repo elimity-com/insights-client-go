@@ -156,8 +156,8 @@ func TestClientReloadDomainGraphTimestamp(t *testing.T) {
 
 func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insights.Client, *httptest.Server) {
 	var handlerFunc http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path != "/custom-connector-domain-graph-reload" {
-			t.Fatalf(`got path %q, want "/custom-connector-domain-graph-reload"`, request.URL.Path)
+		if request.URL.Path != "/custom-connector-domain-graphs" {
+			t.Fatalf(`got path %q, want "/custom-connector-domain-graphs"`, request.URL.Path)
 		}
 
 		actualBodyBytes, err := ioutil.ReadAll(request.Body)
