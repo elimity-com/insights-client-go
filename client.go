@@ -1,26 +1,11 @@
 package insights
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"path"
 )
-
-func makeRequestBodyReader(requestBody interface{}) io.Reader {
-	if requestBody == nil {
-		return nil
-	}
-	requestBodyBytes, err := json.Marshal(requestBody)
-	if err != nil {
-		panic(err)
-	}
-	return bytes.NewReader(requestBodyBytes)
-}
 
 // Client represents an authenticated HTTP client for an Elimity Insights server.
 type Client struct {
@@ -54,71 +39,25 @@ func NewClientDisableTLSCertificateVerification(basePath, token string) Client {
 	}
 }
 
-func (c Client) performRequest(method string, pathComponents []string, requestBody, responseBody interface{}) error {
-	authorization := fmt.Sprintf("Bearer %s", c.token)
-	params := performRequestParams{
-		authorization:  authorization,
-		basePath:       c.basePath,
-		client:         c.client,
-		method:         method,
-		pathComponents: pathComponents,
-		requestBody:    requestBody,
-		responseBody:   responseBody,
-	}
-	return performRequest(params)
-}
-
-type performRequestParams struct {
-	authorization  string
-	basePath       string
-	client         *http.Client
-	method         string
-	pathComponents []string
-	requestBody    interface{}
-	responseBody   interface{}
-}
-
-func performRequest(params performRequestParams) error {
-	p := path.Join(params.pathComponents...)
-	url := fmt.Sprintf("%s/%s", params.basePath, p)
-	requestBodyReader := makeRequestBodyReader(params.requestBody)
-	request, err := http.NewRequest(params.method, url, requestBodyReader)
+func (c Client) performRequest(path, requestContentType string, requestBody io.Reader) error {
+	url := fmt.Sprintf("%s/%s", c.basePath, path)
+	request, err := http.NewRequest(http.MethodPost, url, requestBody)
 	if err != nil {
 		panic(err)
 	}
-
-	if params.authorization != "" {
-		request.Header.Set("Authorization", params.authorization)
-	}
-	if params.requestBody != nil {
-		request.Header.Set("Content-Type", "application/json")
-	}
-
-	response, err := params.client.Do(request)
+	header := request.Header
+	authorization := fmt.Sprintf("Bearer %s", c.token)
+	header.Set("Authorization", authorization)
+	header.Set("Content-Type", requestContentType)
+	response, err := c.client.Do(request)
 	if err != nil {
-		return fmt.Errorf("failed sending request: %w", err)
-	}
-
-	if response.StatusCode < 200 || response.StatusCode > 300 {
-		return fmt.Errorf("response has non-success status code %d", response.StatusCode)
-	}
-
-	bs, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		if err := response.Body.Close(); err != nil {
-			return fmt.Errorf("failed closing response body: %w", err)
-		}
-		return fmt.Errorf("failed reading from response body: %w", err)
+		return fmt.Errorf("failed performing request: %w", err)
 	}
 	if err := response.Body.Close(); err != nil {
 		return fmt.Errorf("failed closing response body: %w", err)
 	}
-
-	if params.responseBody != nil {
-		if err := json.Unmarshal(bs, params.responseBody); err != nil {
-			panic(err)
-		}
+	if statusCode := response.StatusCode; statusCode < 200 || statusCode > 299 {
+		return fmt.Errorf("got non-success status code %d", statusCode)
 	}
-
 	return nil
 }

@@ -1,9 +1,10 @@
 package insights
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
+	tim "time"
 )
 
 // Alertf sends an alert log to the given client's configured server. The log's message is constructed by formatting
@@ -14,13 +15,17 @@ func (c Client) Alertf(format string, args ...interface{}) error {
 
 // CreateConnectorLogs creates the given connector logs at the given client's configured server.
 func (c Client) CreateConnectorLogs(logs []ConnectorLog) error {
-	pathComponents := []string{"custom-connector-logs"}
 	var models []connectorLog
 	for _, log := range logs {
 		model := log.model()
 		models = append(models, model)
 	}
-	return c.performRequest(http.MethodPost, pathComponents, models, nil)
+	requestBodyBytes, err := json.Marshal(models)
+	if err != nil {
+		panic(err)
+	}
+	requestBody := bytes.NewReader(requestBodyBytes)
+	return c.performRequest("custom-connector-logs", "application/json", requestBody)
 }
 
 // Infof sends an info log to the given client's configured server. The log's message is constructed by formatting
@@ -31,7 +36,7 @@ func (c Client) Infof(format string, args ...interface{}) error {
 
 func (c Client) logf(level Level, format string, args ...interface{}) error {
 	message := fmt.Sprintf(format, args...)
-	timestamp := time.Now()
+	timestamp := tim.Now()
 	log := ConnectorLog{
 		Level:     level,
 		Message:   message,
@@ -45,7 +50,7 @@ func (c Client) logf(level Level, format string, args ...interface{}) error {
 type ConnectorLog struct {
 	Level     Level
 	Message   string
-	Timestamp time.Time
+	Timestamp tim.Time
 }
 
 func (l ConnectorLog) model() connectorLog {
@@ -80,7 +85,7 @@ func (l Level) model() string {
 }
 
 type connectorLog struct {
-	Level     string    `json:"level"`
-	Message   string    `json:"message"`
-	Timestamp time.Time `json:"timestamp"`
+	Level     string   `json:"level"`
+	Message   string   `json:"message"`
+	Timestamp tim.Time `json:"timestamp"`
 }
