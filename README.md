@@ -1,7 +1,6 @@
 # Elimity Insights Go client
 
-This Go module provides a client for connector interactions with an Elimity
-Insights server.
+This Go module provides a client for connector interactions with an Elimity Insights server.
 
 ## Usage
 
@@ -42,4 +41,5 @@ $ go get github.com/elimity-com/insights-client-go
 
 | Client version | Insights version |
 | -------------- | ---------------- |
-| 1              | ^2.7             |
+| 1              | 2.7 - 2.11       |
+| ^1.2           | 2.8 - 2.11       |
