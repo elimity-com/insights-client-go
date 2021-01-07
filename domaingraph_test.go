@@ -1,6 +1,7 @@
 package insights_test
 
 import (
+	"compress/zlib"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -8,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go/v2"
+	"github.com/elimity-com/insights-client-go/v3"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -16,20 +17,23 @@ func TestClientReloadDomainGraph(t *testing.T) {
 	expectedBodyString := `{
 		"entities": [
 			{
-				"active": true,
 				"attributeAssignments": [
 					{
 						"attributeTypeName": "foo",
 						"value": {
 							"type": "boolean",
-							"value": "true"
+							"value": true
 						}
 					},
 					{
 						"attributeTypeName": "bar",
 						"value": {
 							"type": "date",
-							"value": "2006-01-02"
+							"value": {
+								"day": 2,
+								"month": 1,
+								"year": 2006
+							}
 						}
 					}
 				],
@@ -38,13 +42,16 @@ func TestClientReloadDomainGraph(t *testing.T) {
 				"type": "baz"
 			},
 			{
-				"active": false,
 				"attributeAssignments": [
 					{
 						"attributeTypeName": "baz",
 						"value": {
 							"type": "time",
-							"value": "15:04:05Z"
+							"value": {
+								"hour": 15,
+								"minute": 4,
+								"second": 5
+							}
 						}
 					}
 				],
@@ -64,10 +71,10 @@ func TestClientReloadDomainGraph(t *testing.T) {
 						}
 					}
 				],
-				"fromId": "foo",
-				"fromType": "baz",
-				"toId": "bar",
-				"toType": "foo"
+				"fromEntityId": "foo",
+				"fromEntityType": "baz",
+				"toEntityId": "bar",
+				"toEntityType": "foo"
 			}
 		]
 	}`
@@ -85,7 +92,6 @@ func TestClientReloadDomainGraph(t *testing.T) {
 	domainGraph := insights.DomainGraph{
 		Entities: []insights.Entity{
 			{
-				Active: true,
 				AttributeAssignments: []insights.AttributeAssignment{
 					{
 						AttributeTypeName: "foo",
@@ -101,7 +107,6 @@ func TestClientReloadDomainGraph(t *testing.T) {
 				Type: "baz",
 			},
 			{
-				Active: false,
 				AttributeAssignments: []insights.AttributeAssignment{
 					{
 						AttributeTypeName: "baz",
@@ -137,14 +142,21 @@ func TestClientReloadDomainGraph(t *testing.T) {
 func TestClientReloadDomainGraphTimestamp(t *testing.T) {
 	expectedBodyString := `{
 		"entities": [],
-		"relationships": [],
-		"historyTimestamp": "2020-06-15T16:26:10Z"
+		"historyTimestamp": {
+			"day": 1,
+			"hour": 2,
+			"minute": 3,
+			"month": 4,
+			"second": 5,
+			"year": 6
+		},
+		"relationships": []
 	}`
 
 	client, server := domainGraphTestClientServer(t, expectedBodyString)
 	defer server.Close()
 
-	timestamp := time.Date(2020, time.June, 15, 16, 26, 10, 0, time.UTC)
+	timestamp := time.Date(6, time.April, 1, 2, 3, 5, 0, time.UTC)
 	domainGraph := insights.DomainGraph{
 		Timestamp: &timestamp,
 	}
@@ -160,9 +172,18 @@ func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insig
 			t.Fatalf(`got path %q, want "/custom-connector-domain-graphs"`, request.URL.Path)
 		}
 
-		actualBodyBytes, err := ioutil.ReadAll(request.Body)
+		reader, err := zlib.NewReader(request.Body)
+		if err != nil {
+			t.Fatalf("failed creating zlib reader: %v", err)
+		}
+
+		actualBodyBytes, err := ioutil.ReadAll(reader)
 		if err != nil {
 			t.Fatalf("failed reading request body: %v", err)
+		}
+
+		if err := reader.Close(); err != nil {
+			t.Fatalf("failed closing zlib reader: %v", err)
 		}
 
 		var actualBody interface{}
@@ -178,7 +199,7 @@ func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insig
 		}
 
 		if diff := cmp.Diff(expectedBody, actualBody); diff != "" {
-			t.Fatalf("body mismatch (-got, +want):\n%s", diff)
+			t.Fatalf("body mismatch (-want, +got):\n%s", diff)
 		}
 	}
 

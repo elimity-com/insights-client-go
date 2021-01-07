@@ -1,8 +1,10 @@
 package insights
 
 import (
-	"net/http"
-	"time"
+	"bytes"
+	"compress/zlib"
+	"encoding/json"
+	tim "time"
 )
 
 // AttributeAssignment represents the assignment of an attribute of a given type with a compatible value, which may be
@@ -24,9 +26,17 @@ func (a AttributeAssignment) model() attributeAssignmentModel {
 
 // ReloadDomainGraph reloads the given domain graph at the given client's configured server.
 func (c Client) ReloadDomainGraph(domainGraph DomainGraph) error {
-	pathComponents := []string{"custom-connector-domain-graphs"}
-	requestBody := domainGraph.model()
-	return c.performRequest(http.MethodPost, pathComponents, requestBody, nil)
+	requestBody := new(bytes.Buffer)
+	writer := zlib.NewWriter(requestBody)
+	encoder := json.NewEncoder(writer)
+	model := domainGraph.model()
+	if err := encoder.Encode(model); err != nil {
+		panic(err)
+	}
+	if err := writer.Close(); err != nil {
+		panic(err)
+	}
+	return c.performRequest("custom-connector-domain-graphs", "application/octet-stream", requestBody)
 }
 
 // DomainGraph represents a graph of domain data that may be managed at an Elimity Insights server.
@@ -34,7 +44,7 @@ func (c Client) ReloadDomainGraph(domainGraph DomainGraph) error {
 type DomainGraph struct {
 	Entities      []Entity
 	Relationships []Relationship
-	Timestamp     *time.Time
+	Timestamp     *tim.Time
 }
 
 func (g DomainGraph) model() domainGraphModel {
@@ -50,16 +60,16 @@ func (g DomainGraph) model() domainGraphModel {
 		relationshipModels = append(relationshipModels, relationshipModel)
 	}
 
+	historyTimestamp := parseDomainGraphTimestamp(g.Timestamp)
 	return domainGraphModel{
-		Entities:      entityModels,
-		Relationships: relationshipModels,
-		Timestamp:     g.Timestamp,
+		Entities:         entityModels,
+		HistoryTimestamp: historyTimestamp,
+		Relationships:    relationshipModels,
 	}
 }
 
 // Entity represents an entity that may be managed at an Elimity Insights server.
 type Entity struct {
-	Active               bool
 	AttributeAssignments []AttributeAssignment
 	ID                   string
 	Name                 string
@@ -74,7 +84,6 @@ func (e Entity) model() entityModel {
 	}
 
 	return entityModel{
-		Active:               e.Active,
 		AttributeAssignments: attributeAssignmentModels,
 		ID:                   e.ID,
 		Name:                 e.Name,
@@ -100,10 +109,10 @@ func (r Relationship) model() relationshipModel {
 
 	return relationshipModel{
 		AttributeAssignments: attributeAssignmentModels,
-		FromID:               r.FromEntityID,
-		FromType:             r.FromEntityType,
-		ToID:                 r.ToEntityID,
-		ToType:               r.ToEntityType,
+		FromEntityID:         r.FromEntityID,
+		FromEntityType:       r.FromEntityType,
+		ToEntityID:           r.ToEntityID,
+		ToEntityType:         r.ToEntityType,
 	}
 }
 
@@ -112,14 +121,21 @@ type attributeAssignmentModel struct {
 	Value             valueModel `json:"value"`
 }
 
+func parseDomainGraphTimestamp(time *tim.Time) *dateTime {
+	if time == nil {
+		return nil
+	}
+	t := parseDateTime(*time)
+	return &t
+}
+
 type domainGraphModel struct {
-	Entities      []entityModel       `json:"entities"`
-	Relationships []relationshipModel `json:"relationships"`
-	Timestamp     *time.Time          `json:"historyTimestamp,omitempty"`
+	Entities         []entityModel       `json:"entities"`
+	HistoryTimestamp *dateTime           `json:"historyTimestamp,omitempty"`
+	Relationships    []relationshipModel `json:"relationships"`
 }
 
 type entityModel struct {
-	Active               bool                       `json:"active"`
 	AttributeAssignments []attributeAssignmentModel `json:"attributeAssignments"`
 	ID                   string                     `json:"id"`
 	Name                 string                     `json:"name"`
@@ -128,8 +144,8 @@ type entityModel struct {
 
 type relationshipModel struct {
 	AttributeAssignments []attributeAssignmentModel `json:"attributeAssignments"`
-	FromID               string                     `json:"fromId"`
-	FromType             string                     `json:"fromType"`
-	ToID                 string                     `json:"toId"`
-	ToType               string                     `json:"toType"`
+	FromEntityID         string                     `json:"fromEntityId"`
+	FromEntityType       string                     `json:"fromEntityType"`
+	ToEntityID           string                     `json:"toEntityId"`
+	ToEntityType         string                     `json:"toEntityType"`
 }
