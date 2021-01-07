@@ -142,14 +142,21 @@ func TestClientReloadDomainGraph(t *testing.T) {
 func TestClientReloadDomainGraphTimestamp(t *testing.T) {
 	expectedBodyString := `{
 		"entities": [],
-		"relationships": [],
-		"historyTimestamp": "2020-06-15T16:26:10Z"
+		"historyTimestamp": {
+			"day": 1,
+			"hour": 2,
+			"minute": 3,
+			"month": 4,
+			"second": 5,
+			"year": 6
+		},
+		"relationships": []
 	}`
 
 	client, server := domainGraphTestClientServer(t, expectedBodyString)
 	defer server.Close()
 
-	timestamp := time.Date(2020, time.June, 15, 16, 26, 10, 0, time.UTC)
+	timestamp := time.Date(6, time.April, 1, 2, 3, 5, 0, time.UTC)
 	domainGraph := insights.DomainGraph{
 		Timestamp: &timestamp,
 	}
@@ -192,7 +199,7 @@ func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insig
 		}
 
 		if diff := cmp.Diff(expectedBody, actualBody); diff != "" {
-			t.Fatalf("body mismatch (-got, +want):\n%s", diff)
+			t.Fatalf("body mismatch (-want, +got):\n%s", diff)
 		}
 	}
 

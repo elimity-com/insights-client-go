@@ -121,16 +121,17 @@ type attributeAssignmentModel struct {
 	Value             valueModel `json:"value"`
 }
 
-func parseDomainGraphTimestamp(time *tim.Time) dateTime {
+func parseDomainGraphTimestamp(time *tim.Time) *dateTime {
 	if time == nil {
-		return dateTime{}
+		return nil
 	}
-	return parseDateTime(*time)
+	t := parseDateTime(*time)
+	return &t
 }
 
 type domainGraphModel struct {
 	Entities         []entityModel       `json:"entities"`
-	HistoryTimestamp dateTime            `json:"historyTimestamp"`
+	HistoryTimestamp *dateTime           `json:"historyTimestamp,omitempty"`
 	Relationships    []relationshipModel `json:"relationships"`
 }
 
