@@ -183,7 +183,7 @@ func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insig
 		}
 
 		if err := reader.Close(); err != nil {
-			t.Fatalf("failed closing zlib reader: %w", err)
+			t.Fatalf("failed closing zlib reader: %v", err)
 		}
 
 		var actualBody interface{}
