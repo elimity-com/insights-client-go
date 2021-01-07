@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go"
+	"github.com/elimity-com/insights-client-go/v2"
 	"github.com/google/go-cmp/cmp"
 )
 
