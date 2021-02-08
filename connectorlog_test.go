@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go/v3"
+	"github.com/elimity-com/insights-client-go/v4"
 )
 
 func TestClientCreateConnectorLogs(t *testing.T) {

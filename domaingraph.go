@@ -13,14 +13,14 @@ import (
 // A given attribute type and value are compatible if their types are equal. For example, a boolean attribute type can
 // only be assigned with a boolean value.
 type AttributeAssignment struct {
-	AttributeTypeName string
-	Value             Value
+	AttributeTypeID string
+	Value           Value
 }
 
 func (a AttributeAssignment) model() attributeAssignmentModel {
 	return attributeAssignmentModel{
-		AttributeTypeName: a.AttributeTypeName,
-		Value:             a.Value.model(),
+		AttributeTypeID: a.AttributeTypeID,
+		Value:           a.Value.model(),
 	}
 }
 
@@ -117,8 +117,8 @@ func (r Relationship) model() relationshipModel {
 }
 
 type attributeAssignmentModel struct {
-	AttributeTypeName string     `json:"attributeTypeName"`
-	Value             valueModel `json:"value"`
+	AttributeTypeID string     `json:"attributeTypeID"`
+	Value           valueModel `json:"value"`
 }
 
 func parseDomainGraphTimestamp(time *tim.Time) *dateTime {

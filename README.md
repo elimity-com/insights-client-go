@@ -8,7 +8,7 @@ This Go module provides a client for connector interactions with an Elimity Insi
 package main
 
 import (
-	"github.com/elimity-com/insights-client-go/v3"
+	"github.com/elimity-com/insights-client-go/v4"
 	"time"
 )
 
@@ -34,7 +34,7 @@ func main() {
 ## Installation
 
 ```sh
-$ go get github.com/elimity-com/insights-client-go/v3
+$ go get github.com/elimity-com/insights-client-go/v4
 ```
 
 ## Compatibility

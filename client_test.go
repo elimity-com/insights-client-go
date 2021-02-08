@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elimity-com/insights-client-go/v3"
+	"github.com/elimity-com/insights-client-go/v4"
 )
 
 func TestNewClientDisableTLSCertificateVerification(t *testing.T) {
