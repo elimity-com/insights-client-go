@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go/v3"
+	"github.com/elimity-com/insights-client-go/v4"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -19,14 +19,14 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				"attributeAssignments": [
 					{
-						"attributeTypeName": "foo",
+						"attributeTypeID": "foo",
 						"value": {
 							"type": "boolean",
 							"value": true
 						}
 					},
 					{
-						"attributeTypeName": "bar",
+						"attributeTypeID": "bar",
 						"value": {
 							"type": "date",
 							"value": {
@@ -44,7 +44,7 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				"attributeAssignments": [
 					{
-						"attributeTypeName": "baz",
+						"attributeTypeID": "baz",
 						"value": {
 							"type": "time",
 							"value": {
@@ -64,7 +64,7 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				"attributeAssignments": [
 					{
-						"attributeTypeName": "asd",
+						"attributeTypeID": "asd",
 						"value": {
 							"type": "string",
 							"value": "asd"
@@ -94,12 +94,12 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				AttributeAssignments: []insights.AttributeAssignment{
 					{
-						AttributeTypeName: "foo",
-						Value:             fooValue,
+						AttributeTypeID: "foo",
+						Value:           fooValue,
 					},
 					{
-						AttributeTypeName: "bar",
-						Value:             barValue,
+						AttributeTypeID: "bar",
+						Value:           barValue,
 					},
 				},
 				ID:   "foo",
@@ -109,8 +109,8 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				AttributeAssignments: []insights.AttributeAssignment{
 					{
-						AttributeTypeName: "baz",
-						Value:             bazValue,
+						AttributeTypeID: "baz",
+						Value:           bazValue,
 					},
 				},
 				ID:   "bar",
@@ -122,8 +122,8 @@ func TestClientReloadDomainGraph(t *testing.T) {
 			{
 				AttributeAssignments: []insights.AttributeAssignment{
 					{
-						AttributeTypeName: "asd",
-						Value:             asdValue,
+						AttributeTypeID: "asd",
+						Value:           asdValue,
 					},
 				},
 				FromEntityID:   "foo",
