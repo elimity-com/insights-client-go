@@ -11,7 +11,7 @@ import (
 func TestNewClientDisableTLSCertificateVerification(t *testing.T) {
 	fun := http.HandlerFunc(handler)
 	server := httptest.NewTLSServer(fun)
-	client := insights.NewClientDisableTLSCertificateVerification(server.URL, "foo")
+	client := insights.NewClientDisableTLSCertificateVerification(server.URL, "foo", 0)
 	if err := client.Infof("foo"); err != nil {
 		t.Fatalf("failed creating info log: %v", err)
 	}
@@ -19,9 +19,9 @@ func TestNewClientDisableTLSCertificateVerification(t *testing.T) {
 
 func handler(http.ResponseWriter, *http.Request) {}
 
-func setup(t *testing.T, handler http.Handler) (insights.Client, *httptest.Server) {
+func setup(t *testing.T, handler http.Handler, sourceID int) (insights.Client, *httptest.Server) {
 	server := httptest.NewServer(handler)
-	client, err := insights.NewClient(server.URL, "foo")
+	client, err := insights.NewClient(server.URL, "foo", sourceID)
 	if err != nil {
 		t.Fatalf("failed creating client: %v", err)
 	}

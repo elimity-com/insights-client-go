@@ -25,7 +25,8 @@ func (c Client) CreateConnectorLogs(logs []ConnectorLog) error {
 		panic(err)
 	}
 	requestBody := bytes.NewReader(requestBodyBytes)
-	return c.performRequest("custom-connector-logs", "application/json", requestBody)
+	path := fmt.Sprintf("custom-sources/%d/connector-logs", c.sourceID)
+	return c.performRequest(path, "application/json", requestBody)
 }
 
 // Infof sends an info log to the given client's configured server. The log's message is constructed by formatting

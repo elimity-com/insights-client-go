@@ -2,6 +2,7 @@ package insights_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -11,10 +12,12 @@ import (
 )
 
 func TestClientCreateConnectorLogs(t *testing.T) {
+	sourceID := 4
 	timestamp := time.Now()
 	var fun http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path != "/custom-connector-logs" {
-			t.Fatalf(`got path %q, want "/custom-connector-logs"`, request.URL.Path)
+		path := fmt.Sprintf("/custom-sources/%d/connector-logs", sourceID)
+		if request.URL.Path != path {
+			t.Fatalf(`got path %q, want %s`, request.URL.Path, path)
 		}
 
 		bs, err := ioutil.ReadAll(request.Body)
@@ -51,7 +54,7 @@ func TestClientCreateConnectorLogs(t *testing.T) {
 		}
 	}
 
-	client, server := setup(t, fun)
+	client, server := setup(t, fun, sourceID)
 	defer server.Close()
 
 	logs := []insights.ConnectorLog{

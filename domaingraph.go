@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/json"
+	"fmt"
 	tim "time"
 )
 
@@ -36,7 +37,8 @@ func (c Client) ReloadDomainGraph(domainGraph DomainGraph) error {
 	if err := writer.Close(); err != nil {
 		panic(err)
 	}
-	return c.performRequest("custom-connector-domain-graphs", "application/octet-stream", requestBody)
+	path := fmt.Sprintf("custom-sources/%d/snapshots", c.sourceID)
+	return c.performRequest(path, "application/octet-stream", requestBody)
 }
 
 // DomainGraph represents a graph of domain data that may be managed at an Elimity Insights server.
