@@ -1,4 +1,4 @@
-module github.com/elimity-com/insights-client-go/v4
+module github.com/elimity-com/insights-client-go/v5
 
 go 1.13
 

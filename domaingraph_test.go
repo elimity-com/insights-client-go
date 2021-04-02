@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go/v4"
+	"github.com/elimity-com/insights-client-go/v5"
 	"github.com/google/go-cmp/cmp"
 )
 
