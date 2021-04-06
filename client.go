@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
 // Client represents an authenticated HTTP client for an Elimity Insights server.
@@ -12,14 +13,16 @@ type Client struct {
 	basePath string
 	client   *http.Client
 	token    string
+	sourceID int
 }
 
 // NewClient creates a new client that is authenticated with the given token at a server at the given base path.
-func NewClient(basePath, token string) (Client, error) {
+func NewClient(basePath, token string, sourceID int) (Client, error) {
 	client := Client{
 		basePath: basePath,
 		client:   http.DefaultClient,
 		token:    token,
+		sourceID: sourceID,
 	}
 	return client, nil
 }
@@ -28,7 +31,7 @@ func NewClient(basePath, token string) (Client, error) {
 // server at the given base path.
 //
 // The resulting client does not verify the TLS certificate of the configured server.
-func NewClientDisableTLSCertificateVerification(basePath, token string) Client {
+func NewClientDisableTLSCertificateVerification(basePath, token string, sourceID int) Client {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := &http.Client{Transport: transport}
@@ -36,6 +39,7 @@ func NewClientDisableTLSCertificateVerification(basePath, token string) Client {
 		basePath: basePath,
 		client:   client,
 		token:    token,
+		sourceID: sourceID,
 	}
 }
 
@@ -45,10 +49,9 @@ func (c Client) performRequest(path, requestContentType string, requestBody io.R
 	if err != nil {
 		panic(err)
 	}
-	header := request.Header
-	authorization := fmt.Sprintf("Bearer %s", c.token)
-	header.Set("Authorization", authorization)
-	header.Set("Content-Type", requestContentType)
+	request.Header.Set("Content-Type", requestContentType)
+	request.SetBasicAuth(strconv.Itoa(c.sourceID), c.token)
+
 	response, err := c.client.Do(request)
 	if err != nil {
 		return fmt.Errorf("failed performing request: %w", err)

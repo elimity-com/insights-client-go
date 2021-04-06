@@ -3,13 +3,14 @@ package insights_test
 import (
 	"compress/zlib"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/elimity-com/insights-client-go/v4"
+	"github.com/elimity-com/insights-client-go/v5"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -167,9 +168,11 @@ func TestClientReloadDomainGraphTimestamp(t *testing.T) {
 }
 
 func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insights.Client, *httptest.Server) {
+	sourceID := 5
 	var handlerFunc http.HandlerFunc = func(writer http.ResponseWriter, request *http.Request) {
-		if request.URL.Path != "/custom-connector-domain-graphs" {
-			t.Fatalf(`got path %q, want "/custom-connector-domain-graphs"`, request.URL.Path)
+		path := fmt.Sprintf("/custom-sources/%d/snapshots", sourceID)
+		if request.URL.Path != path {
+			t.Fatalf(`got path %q, want %s`, request.URL.Path, path)
 		}
 
 		reader, err := zlib.NewReader(request.Body)
@@ -203,5 +206,5 @@ func domainGraphTestClientServer(t *testing.T, expectedBodyString string) (insig
 		}
 	}
 
-	return setup(t, handlerFunc)
+	return setup(t, handlerFunc, sourceID)
 }
