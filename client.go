@@ -32,8 +32,14 @@ func NewClient(basePath, token string, sourceID int) (Client, error) {
 //
 // The resulting client does not verify the TLS certificate of the configured server.
 func NewClientDisableTLSCertificateVerification(basePath, token string, sourceID int) Client {
+	config := &tls.Config{InsecureSkipVerify: true}
+	return NewClientWithTLSConfig(basePath, token, config, sourceID)
+}
+
+// NewClientWithTLSConfig creates a new client that uses the given TLS configuration.
+func NewClientWithTLSConfig(basePath, token string, config *tls.Config, sourceID int) Client {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	transport.TLSClientConfig = config
 	client := &http.Client{Transport: transport}
 	return Client{
 		basePath: basePath,
