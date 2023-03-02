@@ -4,4 +4,7 @@ issues:
 linters:
   enable:
     - goimports
-    - golint
+    - revive
+
+run:
+  deadline: 5m
