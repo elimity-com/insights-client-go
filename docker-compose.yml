@@ -1,0 +1,8 @@
+services:
+  dev:
+    entrypoint: sleep infinity
+    init: true
+    image: ghcr.io/elimity-com/insights-client-go:6547437779
+    volumes:
+      - .:/app
+    working_dir: /app
