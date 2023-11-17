@@ -5,13 +5,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elimity-com/insights-client-go/v6"
+	"github.com/elimity-com/insights-client-go/v7"
 )
 
 func TestInsights(t *testing.T) {
 	handler := handler{t: t}
 	server := httptest.NewServer(handler)
-	if err := insights.CreateSourceConnectorLogs(server.URL, "foo", "bar", nil); err != nil {
+	if err := insights.CreateSourceConnectorLogs(server.URL, "foo", "bar", nil, false); err != nil {
 		t.Errorf("failed creating logs: %v", err)
 	}
 	server.Close()

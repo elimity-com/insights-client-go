@@ -9,6 +9,7 @@ import (
 // ReloadSourceSnapshot sends the given entities and relationships to the referenced Elimity Insights server.
 func ReloadSourceSnapshot(
 	entities []Entity, insightsURL, sourceID, sourceToken string, relationships []Relationship,
+	skipSSLVerification bool,
 ) error {
 	reader, writer := io.Pipe()
 	snapshot := snapshot{
@@ -18,6 +19,7 @@ func ReloadSourceSnapshot(
 	go writeSnapshot(snapshot, writer)
 	err := request(
 		"application/octet-stream", insightsURL, sourceID, sourceToken, "%s/api/sources/%s/snapshots", reader,
+		skipSSLVerification,
 	)
 	_ = reader.Close()
 	return err
